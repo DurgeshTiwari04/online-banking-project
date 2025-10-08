@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Banking Security Project</title>
+    <!-- Load Tailwind CSS for modern styling and responsiveness -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Define Custom Colors and Fonts */
+        :root {
+            --color-primary: #0056b3; /* Dark Blue */
+            --color-secondary: #00c6ff; /* Bright Blue */
+            --color-warning: #ffb700; /* Yellow */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .bg-primary { background-color: var(--color-primary); }
+        .text-primary { color: var(--color-primary); }
+        .bg-secondary { background-color: var(--color-secondary); }
+        .text-secondary { color: var(--color-secondary); }
+        .border-primary { border-color: var(--color-primary); }
+        .border-secondary { border-color: var(--color-secondary); }
+        
+        /* Custom CSS for Tabs */
+        .tab-button.active {
+            background-color: var(--color-primary);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Simple Fade Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn { animation: fadeIn 0.5s ease-out; }
+
+        /* Mobile Fixed Navigation */
+        @media (max-width: 768px) {
+            .mobile-menu {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 50;
+                box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+            main {
+                padding-bottom: 70px; /* Space for fixed mobile menu */
+            }
+        }
+
+        /* --- DARK MODE STYLES --- */
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        body.dark-mode .bg-gray-50, body.dark-mode .bg-gray-100 {
+            background-color: #1f1f1f;
+            color: #e0e0e0;
+        }
+        body.dark-mode .bg-white {
+            background-color: #2c2c2c;
+            color: #e0e0e0;
+        }
+        body.dark-mode .text-gray-800, body.dark-mode .text-gray-900 {
+            color: #ffffff;
+        }
+        body.dark-mode .text-gray-600, body.dark-mode .text-gray-700 {
+            color: #b0b0b0;
+        }
+        body.dark-mode .shadow-lg, body.dark-mode .shadow-xl, body.dark-mode .shadow-2xl {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+        }
+        body.dark-mode .border-gray-200 {
+            border-color: #3f3f3f;
+        }
+        body.dark-mode .hover\:bg-gray-100:hover {
+            background-color: #3a3a3a;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header & Navigation -->
+    <header class="bg-primary shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo/Title -->
+                <a href="#hero" class="text-white text-xl font-bold tracking-wider cursor-pointer flex items-center space-x-2">
+                    <!-- Padlock SVG Icon (Logo) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 11V9a3 3 0 00-6 0v2m6 0h.01M12 11h.01"/>
+                    </svg>
+                    <span>Secure<span class="text-secondary">Banking</span></span>
+                </a>
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex space-x-6 items-center">
+                    <a href="#hero" class="text-white hover:text-secondary transition duration-300 px-3 py-2 rounded-lg nav-link" data-section="hero">Home</a>
+                    <a href="#risks" class="text-white hover:text-secondary transition duration-300 px-3 py-2 rounded-lg nav-link" data-section="risks">Risks</a>
+                    <a href="#frauds" class="text-white hover:text-secondary transition duration-300 px-3 py-2 rounded-lg nav-link" data-section="frauds">Frauds</a>
+                    <a href="#precautions" class="text-white hover:text-secondary transition duration-300 px-3 py-2 rounded-lg nav-link" data-section="precautions">Precautions</a>
+                    <a href="#quiz-content" class="text-white hover:text-secondary transition duration-300 px-3 py-2 rounded-lg nav-link" data-section="quiz">Quiz</a>
+                    
+                    <!-- Dark Mode Toggle (Desktop) -->
+                    <button id="theme-toggle-desktop" class="text-white hover:text-secondary transition duration-300 ml-4 p-2 rounded-full hover:bg-white/10" aria-label="Toggle Dark Mode">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        
+        <!-- HOME SECTION -->
+        <section id="hero" class="text-center py-16 bg-white rounded-xl shadow-xl mb-12 border-t-8 border-secondary">
+            <div class="max-w-3xl mx-auto">
+                <h1 class="text-5xl font-extrabold text-primary mb-4">
+                    Online Banking: Stay Safe, Stay Secure
+                </h1>
+                <p class="text-xl text-gray-600 mb-6">
+                    A comprehensive guide to understanding the risks, identifying frauds, and adopting essential precautions for digital finance.
+                </p>
+                <a href="#precautions" class="inline-block bg-secondary text-primary font-bold py-3 px-8 rounded-full shadow-lg hover:bg-opacity-90 transition duration-300 transform hover:scale-105">
+                    Start Learning Today
+                </a>
+            </div>
+        </section>
+
+        <!-- RISKS SECTION (EXPANDED TO 4 CARDS) -->
+        <section id="risks" class="py-12 animate-fadeIn">
+            <h2 class="text-4xl font-bold text-gray-800 mb-8 border-b-4 border-secondary inline-block pb-1">1. Top Risks in Online Banking</h2>
+
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg transition duration-300 border-t-4 border-primary">
+                    <h3 class="text-2xl font-semibold text-gray-900 pt-1">Unsecured Connections</h3>
+                    <p class="text-gray-600 mt-2">Performing transactions on public Wi-Fi networks (like in cafes or airports) exposes your data to hackers who monitor the network traffic.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg transition duration-300 border-t-4 border-primary">
+                    <h3 class="text-2xl font-semibold text-gray-900 pt-1">Keyloggers & Malware</h3>
+                    <p class="text-gray-600 mt-2">Malicious software installed on your device can record your keystrokes (passwords) or secretly steal information while you log in.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg transition duration-300 border-t-4 border-primary">
+                    <h3 class="text-2xl font-semibold text-gray-900 pt-1">Weak Passwords & OTP</h3>
+                    <p class="text-gray-600 mt-2">Using simple passwords or sharing your One-Time Password (OTP) with anyone, even bank officials, instantly compromises your security.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg transition duration-300 border-t-4 border-primary">
+                    <h3 class="text-2xl font-semibold text-gray-900 pt-1">Malicious Browser Extensions</h3>
+                    <p class="text-gray-600 mt-2">Harmful browser extensions (adware, coupons, etc.) can track your activity and steal login credentials without your knowledge.</p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- FRAUDS SECTION (EXPANDED TO 4 TABS) -->
+        <section id="frauds" class="py-12 animate-fadeIn">
+            <h2 class="text-4xl font-bold text-gray-800 mb-8 border-b-4 border-secondary inline-block pb-1">2. Common Online Banking Frauds</h2>
+
+            <div class="bg-white rounded-xl shadow-xl p-8 mb-12 border-t-8 border-secondary">
+                <!-- Frauds Tabbed Navigation -->
+                <div class="flex flex-col md:flex-row mb-6 border-b border-gray-200">
+                    <button id="phishing-tab" data-tab-id="phishing" class="tab-button flex-1 px-4 py-3 font-semibold text-gray-600 transition duration-300 rounded-t-lg active">Phishing/Vishing</button>
+                    <button id="simswap-tab" data-tab-id="simswap" class="tab-button flex-1 px-4 py-3 font-semibold text-gray-600 transition duration-300 rounded-t-lg">SIM Swap/OTP</button>
+                    <button id="social-tab" data-tab-id="social" class="tab-button flex-1 px-4 py-3 font-semibold text-gray-600 transition duration-300 rounded-t-lg">Social Engineering</button>
+                    <button id="cloning-tab" data-tab-id="cloning" class="tab-button flex-1 px-4 py-3 font-semibold text-gray-600 transition duration-300 rounded-t-lg">Card Cloning/Skimming</button>
+                </div>
+
+                <!-- Frauds Tab Content -->
+                <div id="phishing" class="tab-content active p-4">
+                    <h3 class="text-3xl font-bold text-primary mb-3">Phishing (Email/Link) & Vishing (Voice Call)</h3>
+                    <p class="text-lg text-gray-600 mb-4">The fraudster pretends to be your bank or a government agency via email (Phishing) or phone call (Vishing) to trick you into revealing sensitive information.</p>
+                    <ul class="list-disc list-inside space-y-2 text-gray-700 ml-4">
+                        <li>*Phishing:* Fake emails or SMS with links that lead to a look-alike bank website. Never click on links in unsolicited messages.</li>
+                        <li>*Vishing:* A call where the caller insists your account will be blocked unless you share your PIN, OTP, or card details. Banks *never* ask for this information.</li>
+                    </ul>
+                </div>
+                <div id="simswap" class="tab-content p-4">
+                    <h3 class="text-3xl font-bold text-primary mb-3">SIM Swap Fraud</h3>
+                    <p class="text-lg text-gray-600 mb-4">Fraudsters illegally obtain a new SIM card for your registered number. Once the swap is complete, they receive all your OTPs and bank alerts, giving them full access to your accounts.</p>
+                    <p class="text-gray-700 font-semibold">Precaution:</p>
+                    <p class="text-gray-600">If your mobile network suddenly stops working for an extended period, contact your mobile operator and bank immediately. It may be a SIM swap attempt.</p>
+                </div>
+                <div id="social" class="tab-content p-4">
+                    <h3 class="text-3xl font-bold text-primary mb-3">Social Engineering (The Human Hack)</h3>
+                    <p class="text-lg text-gray-600 mb-4">This involves manipulating you into giving up confidential information. This can happen through: Fake job offers, fake lottery winnings, or fake technical support requests.</p>
+                    <p class="text-gray-700 font-semibold">Remember:</p>
+                    <p class="text-gray-600">If an offer seems too good to be true, it is probably a scam. Never install remote access apps (like AnyDesk or TeamViewer) at the request of an unknown caller.</p>
+                </div>
+                <div id="cloning" class="tab-content p-4">
+                    <h3 class="text-3xl font-bold text-primary mb-3">Card Cloning & Skimming</h3>
+                    <p class="text-lg text-gray-600 mb-4">Fraudsters use a small device (skimmer) placed on ATMs or Point-of-Sale machines to secretly copy your card data when you insert it. They often install a hidden camera or fake keypad to capture your PIN.</p>
+                    <p class="text-gray-700 font-semibold">Precaution:</p>
+                    <p class="text-gray-600">Always check the card slot for loose parts and cover the keypad with your hand when entering your PIN.</p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- PRECAUTIONS SECTION -->
+        <section id="precautions" class="py-12 animate-fadeIn">
+            <h2 class="text-4xl font-bold text-gray-800 mb-8 border-b-4 border-secondary inline-block pb-1">3. Essential Security Precautions</h2>
+
+            <div class="bg-primary text-white p-8 rounded-xl shadow-2xl">
+                <ul class="space-y-6">
+                    <!-- Precaution 1 -->
+                    <li class="flex items-start">
+                        <span class="text-secondary text-2xl font-bold mr-4">1.</span>
+                        <div>
+                            <p class="text-xl font-semibold">Use Strong and Unique Passwords</p>
+                            <p class="text-gray-200">Your password should be long (12+ characters) and contain a mix of uppercase, lowercase, numbers, and symbols. Never use the same password for banking and social media.</p>
+                        </div>
+                    </li>
+                    <!-- Precaution 2 -->
+                    <li class="flex items-start">
+                        <span class="text-secondary text-2xl font-bold mr-4">2.</span>
+                        <div>
+                            <p class="text-xl font-semibold">Enable Two-Factor Authentication (2FA)</p>
+                            <p class="text-gray-200">Always activate the highest level of security available, such as biometric login (fingerprint/face ID) or app-based 2FA, not just SMS OTP.</p>
+                        </div>
+                    </li>
+                    <!-- Precaution 3 -->
+                    <li class="flex items-start">
+                        <span class="text-secondary text-2xl font-bold mr-4">3.</span>
+                        <div>
+                            <p class="text-xl font-semibold">Verify Website Security (HTTPS)</p>
+                            <p class="text-gray-200">Always check that the website address starts with https:// and look for the padlock icon in the address bar before logging in.</p>
+                        </div>
+                    </li>
+                    <!-- Precaution 4 -->
+                    <li class="flex items-start">
+                        <span class="text-secondary text-2xl font-bold mr-4">4.</span>
+                        <div>
+                            <p class="text-xl font-semibold">Keep Software Updated</p>
+                            <p class="text-gray-200">Update your mobile operating system, browser, and banking apps immediately. Updates often contain critical security patches against new threats.</p>
+                        </div>
+                    </li>
+                    <!-- Precaution 5 -->
+                    <li class="flex items-start">
+                        <span class="text-secondary text-2xl font-bold mr-4">5.</span>
+                        <div>
+                            <p class="text-xl font-semibold">Protect Your OTP and PIN</p>
+                            <p class="text-gray-200">Your bank or RBI will *never* call, text, or email you to ask for your password, PIN, CVV, or OTP. If someone asks, it is a fraudster.</p>
+                        </div>
+                    </li>
+                    <!-- Precaution 6 -->
+                    <li class="flex items-start">
+                        <span class="text-secondary text-2xl font-bold mr-4">6.</span>
+                        <div>
+                            <p class="text-xl font-semibold">Regularly Check Account Statements</p>
+                            <p class="text-gray-200">Check your bank statements and transaction history frequently. Reporting unauthorized activity immediately is key to minimizing loss.</p>
+                        </div>
+                    </li>
+                    <!-- Precaution 7 -->
+                    <li class="flex items-start">
+                        <span class="text-secondary text-2xl font-bold mr-4">7.</span>
+                        <div>
+                            <p class="text-xl font-semibold">Use Trusted Antivirus/Security Software</p>
+                            <p class="text-gray-200">Install and maintain reputable antivirus and antimalware software on your computer and mobile phone to detect and block threats.</p>
+                        </div>
+                    </li>
+                    <!-- Precaution 8 -->
+                    <li class="flex items-start">
+                        <span class="text-secondary text-2xl font-bold mr-4">8.</span>
+                        <div>
+                            <p class="text-xl font-semibold">Verify Official Communication Channels</p>
+                            <p class="text-gray-200">Know your bank's official email domain, phone numbers, and only use the official mobile app to interact with your bank.</p>
+                        </div>
+                    </li>
+                    <!-- Precaution 9 -->
+                    <li class="flex items-start">
+                        <span class="text-secondary text-2xl font-bold mr-4">9.</span>
+                        <div>
+                            <p class="text-xl font-semibold">Always Log Out After Use</p>
+                            <p class="text-gray-200">Never just close the tab. Always click the *Logout* or *Sign Out* button, especially on shared or public devices, to terminate your session properly.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+
+        <!-- QUIZ SECTION -->
+        <section id="quiz-content" class="py-12 animate-fadeIn">
+            <h2 class="text-4xl font-bold text-gray-800 mb-8 border-b-4 border-secondary inline-block pb-1">4. Test Your Security Awareness</h2>
+            <div class="bg-white p-8 rounded-xl shadow-xl border-t-8 border-warning">
+                <form id="quiz-form" class="space-y-6">
+                    <!-- Quiz Questions will be injected here by JavaScript -->
+                </form>
+
+                <button id="submit-quiz-btn" class="mt-8 bg-warning text-gray-900 font-bold py-3 px-8 rounded-lg shadow-md hover:bg-yellow-500 transition duration-300 transform hover:scale-105">
+                    Submit Quiz & Get Score
+                </button>
+
+                <!-- Quiz Results Display -->
+                <div id="quiz-results" class="mt-6 text-center text-xl font-semibold p-4 rounded-lg animate-fadeIn bg-gray-100 border-t-4 border-primary hidden">
+                    <!-- Results injected by JavaScript -->
+                </div>
+
+            </div>
+        </section>
+    </main>
+    
+    <!-- FOOTER SECTION (PROJECT INFO & CYBER CONTACT) -->
+    <footer class="bg-gray-800 text-white py-10 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            
+            <h2 class="text-3xl font-bold text-white mb-6">Project & Contact Information</h2>
+            
+            <p class="text-lg text-gray-300 mb-8">
+                This educational website was created for a college field project on *Online Banking Security*.
+            </p>
+            
+            <div class="grid md:grid-cols-3 gap-8 mb-10">
+                <!-- 1. Project Details Box (UPDATED with requested details) -->
+                <div class="p-6 rounded-xl shadow-xl bg-white text-gray-800">
+                    <h3 class="text-xl font-bold text-primary mb-4">Student & Mentor Details</h3>
+                    <div class="space-y-3 text-left">
+                           <p><strong>Course: </strong>SYBSC IT</p>
+      			   <p><strong>Section:</strong> F</p>
+
+                        <div class="mt-2">
+                            <p class="font-semibold">Student 1:</p>
+                            <p class="text-lg">Durgesh Tiwari</p>
+                            <p class="text-sm text-gray-600">ID: 6311</p>
+                        </div>
+
+                        <div class="mt-2">
+                            <p class="font-semibold">Student 2:</p>
+                            <p class="text-lg">Atharva Bhosale</p>
+                            <p class="text-sm text-gray-600">ID: 6252</p>
+                        </div>
+
+                        <div class="mt-2">
+                            <p class="font-semibold">Mentor/Guide:</p>
+                            <p class="text-lg text-gray-700">Punam Sindhu</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Cyber Crime Contact Box -->
+                <div class="p-6 rounded-xl shadow-xl bg-red-800 text-white border-4 border-white">
+                    <h3 class="text-2xl font-extrabold mb-3">CYBER CRIME HELPLINE</h3>
+                    <p class="text-lg mb-4">If you are a victim of financial fraud, report immediately:</p>
+                    
+                    <a href="tel:1930" class="block bg-warning text-gray-900 font-extrabold text-3xl py-3 rounded-lg shadow-2xl transition duration-300 hover:bg-yellow-400">
+                        CALL 1930
+                    </a>
+                    
+                    <p class="text-sm mt-3 text-gray-300">
+                        You can also register a complaint online at the official portal:
+                        <a href="https://cybercrime.gov.in" target="_blank" class="text-secondary hover:underline">cybercrime.gov.in</a>
+                    </p>
+                </div>
+                
+                <!-- 3. NGO Awareness Contact Box (NEW: Now with bg-secondary for better visibility) -->
+                <div class="p-6 rounded-xl shadow-xl bg-secondary text-white border-4 border-white">
+                    <h3 class="text-2xl font-extrabold mb-3">AWARENESS DRIVE CONTACT</h3>
+                    <p class="text-lg font-semibold mb-2">NGO: Digital Suraksha Foundation (Mock)</p>
+                    <p class="text-sm mb-4">You can contact this NGO for organizing free cyber security workshops in educational institutions.</p>
+                    
+                    <a href="tel:1800123456" class="block bg-primary text-white font-extrabold text-2xl py-2 rounded-lg shadow-lg transition duration-300 hover:bg-primary/90">
+                        CALL 1800-123-456
+                    </a>
+                    
+                    <p class="text-sm mt-3 text-gray-100">
+                        Email: 
+                        <a href="mailto:contact@digitalsuraksha.org" class="font-bold hover:underline text-white">contact@digitalsuraksha.org</a>
+                    </p>
+                </div>
+            </div>
+
+
+            <p class="mt-8 text-sm text-gray-500">
+                &copy; 2025 SecureBanking Project. All Rights Reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Mobile Fixed Navigation Menu -->
+    <div class="md:hidden mobile-menu bg-white border-t border-gray-200 flex justify-around">
+        <a href="#hero" class="text-center text-primary flex flex-col items-center p-2 nav-link" data-section="hero"><span class="text-xl">🏠</span><span class="text-xs">Home</span></a>
+        <a href="#risks" class="text-center text-primary flex flex-col items-center p-2 nav-link" data-section="risks"><span class="text-xl">⚠</span><span class="text-xs">Risks</span></a>
+        <a href="#frauds" class="text-center text-primary flex flex-col items-center p-2 nav-link" data-section="frauds"><span class="text-xl">🚨</span><span class="text-xs">Frauds</span></a>
+        <a href="#precautions" class="text-center text-primary flex flex-col items-center p-2 nav-link" data-section="precautions"><span class="text-xl">✅</span><span class="text-xs">Precautions</span></a>
+        <a href="#quiz-content" class="text-center text-primary flex flex-col items-center p-2 nav-link" data-section="quiz"><span class="text-xl">🧠</span><span class="text-xs">Quiz</span></a>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA ---
+        const quizData = [
+            {
+                question: "What is the single most secure way to protect your account besides a password?",
+                options: ["Using different devices", "Enabling Two-Factor Authentication (2FA)", "Clearing browser history", "Changing the password often"],
+                answer: "Enabling Two-Factor Authentication (2FA)"
+            },
+            {
+                question: "If your bank calls and asks for your OTP to 'verify' your account, what should you do?",
+                options: ["Give it to them immediately to prevent blockage", "Tell them you will call them back on the official bank number", "Ask them to send the request via email first", "Give them the first 3 digits of the OTP"],
+                answer: "Tell them you will call them back on the official bank number"
+            },
+            {
+                question: "What is Phishing primarily designed to steal?",
+                options: ["Your device's location", "Your Wi-Fi password", "Your personal login credentials (username/password)", "Your mobile network signal"],
+                answer: "Your personal login credentials (username/password)"
+            },
+            {
+                question: "Which web address is secure for banking?",
+                options: ["http://bank.in/", "https://bank.in/", "ftp://bank.in/", "https://192.168.1.1"],
+                answer: "https://bank.in/"
+            },
+            {
+                question: "What is SIM Swap Fraud?",
+                options: ["Swapping your phone brand", "Fraudsters taking control of your mobile number/SIM card", "Using a dual-SIM phone", "Swapping your old bank account for a new one"],
+                answer: "Fraudsters taking control of your mobile number/SIM card"
+            },
+            {
+                question: "Which of these devices is safest for online banking?",
+                options: ["A public internet cafe computer", "A personal mobile phone with updated software", "A friend's tablet on public Wi-Fi", "A smart TV with a banking app"],
+                answer: "A personal mobile phone with updated software"
+            },
+            {
+                question: "What should you do immediately after completing a transaction on a shared computer?",
+                options: ["Close the browser tab", "Clear the browsing history", "Click the 'Logout' or 'Sign Out' button", "Change the desktop background"],
+                answer: "Click the 'Logout' or 'Sign Out' button"
+            },
+            {
+                question: "If you receive a message saying you won a lottery and need to pay a small fee to claim the prize, what is this called?",
+                options: ["A legitimate bank offer", "Social Engineering Fraud", "A Vishing attack", "Two-Factor Authentication"],
+                answer: "Social Engineering Fraud"
+            },
+            {
+                question: "Is it safe to use complex banking apps on public, unsecured Wi-Fi?",
+                options: ["Yes, if you use a VPN", "Yes, the apps are secure anyway", "No, always use secured, private networks", "Only if the transaction is small"],
+                answer: "No, always use secured, private networks"
+            },
+            {
+                question: "What is the minimum recommended length for a strong banking password?",
+                options: ["4 characters", "8 characters", "12 characters or more", "10 characters with numbers only"],
+                answer: "12 characters or more"
+            }
+        ];
+
+        // --- DOM MANIPULATION & INTERACTIVITY ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeQuiz();
+            setupTabSwitching();
+            setupSmoothScrolling();
+            updateNavLinkStyles();
+            setupDarkMode(); // Initialize Dark Mode
+
+            // Initial highlight for the Home link
+            document.querySelector('.nav-link[data-section="hero"]').classList.add('bg-secondary/20', 'font-bold');
+        });
+        
+        // --- QUIZ LOGIC ---
+
+        function initializeQuiz() {
+            const quizForm = document.getElementById('quiz-form');
+            if (!quizForm) return;
+
+            quizForm.innerHTML = quizData.map((item, qIndex) => `
+                <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                    <p class="text-lg font-bold text-gray-800 mb-3">Q${qIndex + 1}: ${item.question}</p>
+                    <div class="space-y-2">
+                        ${item.options.map((option, oIndex) => `
+                            <label class="flex items-center space-x-2 text-gray-700 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition duration-150">
+                                <input 
+                                    type="radio" 
+                                    name="question-${qIndex}" 
+                                    value="${option}" 
+                                    class="text-primary focus:ring-primary h-4 w-4">
+                                <span>${option}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('submit-quiz-btn').addEventListener('click', submitQuiz);
+        }
+
+        function submitQuiz() {
+            const form = document.getElementById('quiz-form');
+            const resultsDiv = document.getElementById('quiz-results');
+            const submitBtn = document.getElementById('submit-quiz-btn');
+            
+            let score = 0;
+            const totalQuestions = quizData.length;
+
+            quizData.forEach((item, index) => {
+                // FIX: Added backticks around the query selector string
+                const selectedOption = form.querySelector(`input[name="question-${index}"]:checked`);
+                if (selectedOption && selectedOption.value === item.answer) {
+                    score++;
+                }
+            });
+
+            const percentage = (score / totalQuestions) * 100;
+            const feedback = getQuizFeedback(percentage);
+
+            resultsDiv.innerHTML = `
+                <p class="text-2xl font-extrabold text-primary mb-2">Quiz Results</p>
+                <p>Your Score: <span class="text-green-600">${score}</span> out of ${totalQuestions}</p>
+                <p>Percentage: <span class="text-primary font-bold">${percentage.toFixed(0)}%</span></p>
+                <p class="mt-4">${feedback}</p>
+            `;
+            resultsDiv.classList.remove('hidden');
+            submitBtn.disabled = true;
+        }
+
+        function getQuizFeedback(percentage) {
+            if (percentage >= 90) return "Excellent! You are highly aware of online banking security risks.";
+            if (percentage >= 70) return "Good job! You have strong security knowledge, but review the Precautions section.";
+            if (percentage >= 50) return "Awareness needed. Review the Frauds and Risks sections carefully.";
+            return "Urgent review required! Your accounts may be at risk due to low security awareness.";
+        }
+
+        // --- TAB SWITCHING (FRAUDS SECTION) ---
+        function setupTabSwitching() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const initialTab = document.querySelector('.tab-button.active').getAttribute('data-tab-id');
+            document.getElementById(initialTab).classList.add('active');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab-id');
+                    
+                    // Deactivate all buttons
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    // Activate clicked button
+                    button.classList.add('active');
+
+                    // Hide all content
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    // Show target content
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        }
+        
+        // --- NAVIGATION & STYLES ---
+
+        function setupSmoothScrolling() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        }
+
+        function updateNavLinkStyles() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const targetId = entry.target.id;
+                    // FIX: Added backticks around the query selector string
+                    const navLink = document.querySelector(`.nav-link[data-section="${targetId}"]`);
+                    
+                    if (navLink) {
+                        document.querySelectorAll('.nav-link').forEach(link => {
+                            link.classList.remove('bg-secondary/20', 'font-bold');
+                        });
+
+                        if (entry.isIntersecting) {
+                            navLink.classList.add('bg-secondary/20', 'font-bold');
+                        }
+                    }
+                });
+            }, { threshold: 0.5 }); // Trigger when 50% of the section is visible
+
+            document.querySelectorAll('main section').forEach(section => {
+                observer.observe(section);
+            });
+        }
+        
+        // --- NEW FEATURE: DARK MODE TOGGLE ---
+
+        function setupDarkMode() {
+            const body = document.body;
+            const toggleDesktop = document.getElementById('theme-toggle-desktop');
+            const toggleMobile = document.getElementById('theme-toggle-mobile');
+
+            // 1. Check preference in localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-mode');
+            }
+
+            // 2. Function to toggle theme and save preference
+            const toggleTheme = () => {
+                if (body.classList.contains('dark-mode')) {
+                    body.classList.remove('dark-mode');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    body.classList.add('dark-mode');
+                    localStorage.setItem('theme', 'dark');
+                }
+            };
+
+            // 3. Attach event listeners
+            toggleDesktop.addEventListener('click', toggleTheme);
+            if(toggleMobile) toggleMobile.addEventListener('click', toggleTheme);
+        }
+
+    </script>
+</body>
+</html>
